@@ -35,7 +35,7 @@ Supports the following
 
 ## Requirements
 
-- Python 3+ (was written with 3.14)
+- Python 3.10+ (was written with 3.14)
 - PySide6
 - vdf
 - Steam client installed and logged in
