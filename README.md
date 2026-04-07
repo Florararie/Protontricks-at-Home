@@ -1,7 +1,8 @@
 # Protontricks at Home
 
-"Mommmmm I want Protontricks!" .. "We have Protontricks at home sweetie.."  
-
+_"Mommmmm I want Protontricks!" .. "We have Protontricks at home sweetie.."_  
+<br/>
+<br/>
 Essentially just a hobby-made knockoff of Protontricks made using Python / Qt6.. with a few fluffy features.  
 
 Supports the following
@@ -22,8 +23,7 @@ Supports the following
 - Can launch the game from UI (utilizes Steam URI's for steam games and shortcuts alike)  
 
 - Can copy / open the compatdata path for easier management of titles  
-
-- Can also copy App ID  
+- - Can also copy App ID  
 
 - And of course, can launch Winetricks in the selected game's proton prefix.
 
