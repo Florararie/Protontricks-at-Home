@@ -296,7 +296,7 @@ class MainWindow(QWidget):
         return QIcon(pix)
 
 
-    def get_steam_header(self, appid: str, app_type: str = "steam") -> QPixmap | None:
+    def get_steam_header(self, appid: str, app_type: str = "steam") -> Optional[QPixmap]:
         cache_key = f"{app_type}_{appid}"
         if cache_key in self.header_cache:
             return self.header_cache[cache_key]

@@ -42,7 +42,7 @@ Essentially just a hobby-made knockoff of Protontricks made using Python / Qt6..
 
 ## Requirements
 
-- Python 3.10+ (was written with 3.14)
+- Python 3.7.5+ (written with 3.14.4 but tested and working on 3.7.5)
 - PySide6
 - vdf
 - Steam client installed and logged in

@@ -5,7 +5,7 @@ import sys
 import logging
 import argparse
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional, Literal
+from typing import Dict, Any, List, Optional
 from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QListWidget, QPushButton, QLabel
 
 from Classes.GUI.MainWindow import MainWindow
@@ -30,7 +30,7 @@ class Context:
 
 
 
-def resolve_install(args: argparse.Namespace, mode: Literal["CLI", "GUI"] = "CLI") -> Optional[SteamInstallation]:
+def resolve_install(args: argparse.Namespace, mode: str = "CLI") -> Optional[SteamInstallation]:
     """Resolve Steam installation from CLI/env/etc"""
     if args.steam_root:
         logger.debug(f"Checking --steam-root: {args.steam_root}")

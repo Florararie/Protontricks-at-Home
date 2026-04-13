@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class SteamInstallation:
     name: str
     path: str
-    command: list[str]
+    command: List[str]
 
 
 

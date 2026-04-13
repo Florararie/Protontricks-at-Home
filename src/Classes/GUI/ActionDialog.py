@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QFrame, QPushButton, QGridLayout
@@ -17,7 +17,7 @@ def format_bytes(size: int) -> str:
     return f"{size:.2f} PB"
 
 
-def format_unix(ts: str | int) -> str:
+def format_unix(ts: Union[str, int]) -> str:
     """Format a Unix timestamp into a readable date and time string."""
     try:
         ts = int(ts)
@@ -26,7 +26,7 @@ def format_unix(ts: str | int) -> str:
         return "Unknown"
 
 
-def format_playtime(minutes: int | str) -> str:
+def format_playtime(minutes: Union[int, str]) -> str:
     """Format playtime in minutes to hours."""
     try:
         return f"{int(minutes)/60:.1f} hours"

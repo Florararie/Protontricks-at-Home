@@ -8,6 +8,8 @@ from typing import List, Optional, Dict, Callable, Any
 from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtCore import QTimer, QProcess, QProcessEnvironment
 
+from Classes.Steam.SteamDetector import SteamInstallation
+
 
 
 logger = logging.getLogger(__name__)
