@@ -1,20 +1,24 @@
 import os
 import vdf
 import logging
-from typing import Dict, List, Any, Tuple
+
+from typing import Dict, List, Any, Tuple, Optional
 
 
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 
 
 class SteamPaths:
     def __init__(self, steam_root: str) -> None:
+        """Initialize SteamPaths with the Steam installation root."""
         self.root = os.path.expanduser(steam_root)
         self.userdata = os.path.join(self.root, "userdata")
 
+
     def library_paths(self) -> List[str]:
+        """Get all Steam library paths including the main library and additional ones."""
         paths: List[str] = []
 
         main = os.path.join(self.root, "steamapps")
@@ -39,7 +43,7 @@ class SteamPaths:
                     paths.append(sa)
 
         except Exception as e:
-            logging.warning(f"Failed to read library folders: {e}")
+            logger.warning(f"Failed to read library folders: {e}")
 
         return paths
 
@@ -47,11 +51,13 @@ class SteamPaths:
 
 class SteamUser:
     def __init__(self, steam_root: str) -> None:
+        """Initialize SteamUser with the Steam root directory."""
         self.root = steam_root
         self._users_cache = None
 
 
     def _load_users(self) -> dict:
+        """Load user data from loginusers.vdf."""
         if self._users_cache is not None:
             return self._users_cache
             
@@ -64,18 +70,20 @@ class SteamUser:
                     data = vdf.load(f)
                 users = data.get("users", {})
             except Exception as e:
-                logging.warning(f"Failed to load users: {e}")
+                logger.warning(f"Failed to load users: {e}")
         
         self._users_cache = users
         return users
 
 
     def get_all_users(self) -> List[Tuple[str, str]]:
+        """Get all Steam users that have logged in."""
         users_data = self._load_users()
         return [(steamid, info.get("PersonaName", "Unknown")) for steamid, info in users_data.items()]
 
 
-    def get_active_user(self) -> Tuple[str | None, str | None]:
+    def get_active_user(self) -> Tuple[Optional[str], Optional[str]]:
+        """Get the most recently active Steam user."""
         users_data = self._load_users()
         
         for steamid, info in users_data.items():
@@ -88,6 +96,7 @@ class SteamUser:
 
 class SteamApps:
     def __init__(self, paths: SteamPaths, steamid: str) -> None:
+        """Initialize SteamApps for a specific user."""
         if not steamid or not steamid.isdigit():
             raise ValueError(f"Invalid steamid: {steamid}")
         self.paths = paths
@@ -96,6 +105,7 @@ class SteamApps:
 
 
     def _localconfig_path(self) -> str:
+        """Get the path to the user's localconfig.vdf file."""
         return os.path.join(
             self.paths.userdata,
             self.user_id,
@@ -105,6 +115,7 @@ class SteamApps:
 
 
     def _load_playtimes(self) -> Dict[str, int]:
+        """Load playtime data from localconfig.vdf."""
         playtimes: Dict[str, int] = {}
         path = self._localconfig_path()
 
@@ -130,12 +141,13 @@ class SteamApps:
                     continue
 
         except Exception as e:
-            logging.warning(f"Failed to load playtimes: {e}")
+            logger.warning(f"Failed to load playtimes: {e}")
 
         return playtimes
 
 
     def installed(self) -> Dict[str, Dict[str, Any]]:
+        """Find all installed Steam games/apps for the user."""
         apps: Dict[str, Dict[str, Any]] = {}
         playtimes = self._load_playtimes()
 
@@ -180,11 +192,11 @@ class SteamApps:
                         }
 
                     except Exception as e:
-                        logging.warning(f"Failed to parse manifest {manifest}: {e}")
+                        logger.warning(f"Failed to parse manifest {manifest}: {e}")
                         continue
 
             except OSError as e:
-                logging.warning(f"Failed to read library directory {library}: {e}")
+                logger.warning(f"Failed to read library directory {library}: {e}")
                 continue
 
         return apps
@@ -193,11 +205,13 @@ class SteamApps:
 
 class SteamShortcuts:
     def __init__(self, paths: SteamPaths, steamid: str) -> None:
+        """Initialize SteamShortcuts for a specific user."""
         self.paths = paths
         self.user_id = str(int(steamid) & 0xFFFFFFFF) if steamid else None
 
 
     def installed(self) -> Dict[str, Dict[str, Any]]:
+        """Find all non-Steam shortcuts for the user."""
         if not self.user_id:
             return {}
 
@@ -230,19 +244,21 @@ class SteamShortcuts:
                 }
 
         except Exception as e:
-            logging.warning(f"Failed to read shortcuts: {e}")
+            logger.warning(f"Failed to read shortcuts: {e}")
 
         return shortcuts
 
 
 
-class ProtonPrefixes:
-    def __init__(self, paths: SteamPaths, apps, shortcuts) -> None:
+class ProtonPrefixes:    
+    def __init__(self, paths: SteamPaths, apps: Dict[str, Dict[str, Any]], shortcuts: Dict[str, Dict[str, Any]]) -> None:
+        """Initialize ProtonPrefixes with Steam apps and shortcuts."""
         self.paths = paths
         self.entries = {**apps, **shortcuts}
 
 
     def _is_initialized(self, app_folder: str, pfx: str) -> bool:
+        """Check if a Proton prefix has been initialized."""
         if not os.path.isdir(pfx):
             return False
 
@@ -251,6 +267,7 @@ class ProtonPrefixes:
 
 
     def all(self) -> List[Dict[str, Any]]:
+        """Find all Proton prefixes for the installed apps and shortcuts."""
         seen = {}
 
         for library in self.paths.library_paths():

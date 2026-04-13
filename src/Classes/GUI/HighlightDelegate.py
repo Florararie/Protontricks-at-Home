@@ -1,24 +1,30 @@
 import html
+
+from typing import Optional, Dict, Any
+
 from PySide6.QtCore import Qt, QRectF, QSize
-from PySide6.QtGui import QPainter, QTextDocument, QTextOption, QFont
+from PySide6.QtGui import QPainter, QTextDocument, QTextOption, QFont, QPixmap
 from PySide6.QtWidgets import QStyledItemDelegate, QLineEdit, QStyle
 
 
 
-class HighlightDelegate(QStyledItemDelegate):
+class HighlightDelegate(QStyledItemDelegate):    
     ICON_SIZE = 32
     ITEM_HEIGHT = 36
     ICON_PADDING = 2
     TEXT_PADDING = 6
+    TEXT_WIDTH = 2000
 
 
-    def __init__(self, search_widget: QLineEdit, parent=None):
+    def __init__(self, search_widget: QLineEdit, parent: Optional[Any] = None) -> None:
+        """Initialize the highlight delegate."""
         super().__init__(parent)
         self.search_widget = search_widget
-        self._current_query = ""
+        self._current_query: str = ""
 
 
-    def paint(self, painter: QPainter, option, index):
+    def paint(self, painter: QPainter, option: Any, index: Any) -> None:
+        """Paint the list item with custom rendering including icon, highlighted text, and status."""
         data = index.data(Qt.UserRole)
         if not data:
             return super().paint(painter, option, index)
@@ -39,12 +45,14 @@ class HighlightDelegate(QStyledItemDelegate):
         painter.restore()
 
 
-    def _draw_background(self, painter, option):
+    def _draw_background(self, painter: QPainter, option: Any) -> None:
+        """Draw the background for the item, highlighting if selected."""
         if option.state & QStyle.State_Selected:
             painter.fillRect(option.rect, option.palette.highlight())
 
 
-    def _get_layout_rects(self, rect, icon):
+    def _get_layout_rects(self, rect: QRectF, icon: Optional[QPixmap]) -> tuple:
+        """Calculate the layout rectangles for icon and text based on the item rect."""
         if icon:
             icon_rect = QRectF(
                 rect.left() + self.ICON_PADDING,
@@ -66,7 +74,8 @@ class HighlightDelegate(QStyledItemDelegate):
         return icon_rect, text_rect
 
 
-    def _draw_text(self, painter, option, rect, html_text):
+    def _draw_text(self, painter: QPainter, option: Any, rect: QRectF, html_text: str) -> None:
+        """Draw the HTML-formatted text using QTextDocument for rich text rendering."""
         doc = QTextDocument()
         doc.setDefaultFont(option.font)
         
@@ -75,13 +84,14 @@ class HighlightDelegate(QStyledItemDelegate):
         doc.setDefaultTextOption(text_option)
         
         doc.setHtml(html_text)
-        doc.setTextWidth(2000)
+        doc.setTextWidth(self.TEXT_WIDTH)
 
         painter.translate(rect.topLeft())
-        doc.drawContents(painter, QRectF(0, 0, 2000, self.ITEM_HEIGHT))
+        doc.drawContents(painter, QRectF(0, 0, self.TEXT_WIDTH, self.ITEM_HEIGHT))
 
 
-    def _build_html(self, data, option):
+    def _build_html(self, data: Dict[str, Any], option: Any) -> str:
+        """Build the HTML string for the item text with highlighting and status indicators."""
         name = f"{data['name']}: {data['appid']}"
         suffix = ""
         if not data.get("initialized", True):
@@ -95,7 +105,8 @@ class HighlightDelegate(QStyledItemDelegate):
         return highlighted + suffix
 
 
-    def _highlight_text(self, text, query, option):
+    def _highlight_text(self, text: str, query: str, option: Any) -> str:
+        """Highlight occurrences of the search query within the text."""
         result = ""
         i = 0
         lower = text.lower()
@@ -119,7 +130,8 @@ class HighlightDelegate(QStyledItemDelegate):
         return result
 
 
-    def sizeHint(self, option, index):
+    def sizeHint(self, option: Any, index: Any) -> QSize:
+        """Provide the size hint for the item based on content and layout."""
         data = index.data(Qt.UserRole)
         if not data:
             return super().sizeHint(option, index)
