@@ -5,28 +5,35 @@ _"Mommmmm I want Protontricks!" .. "We have Protontricks at home sweetie.."_
 <br/>
 Essentially just a hobby-made knockoff of Protontricks made using Python / Qt6.. with a few fluffy features.  
 
-Supports the following
+## Features
 
-- Comprehensive filtering
-- - Filter based on title text / app id (typing will make the search bar appear automatically)
-- - Filter alphabetically
-- - Filter by last played
-- - Filter by size on disk
-- - Filter by playtime (both ascending and descending)
-- - Filter by Steam installed games or Non-Steam Shortcuts
-- - Filter by Non-Initialized prefixes (games that havent had their proton prefix properly created yet)  
+### GUI Features
 
-- Randomly select a game when you dont know what to play  
+- **Comprehensive filtering & sorting**
+  - Filter by title text / App ID (typing makes search bar appear automatically)
+  - Sort alphabetically, by last played, size on disk, playtime (ascending/descending)
+  - Filter by Steam games or Non-Steam Shortcuts
+  - Filter by Non-Initialized prefixes (games that haven't had their Proton prefix created yet)
 
-- Switch to view libraries of other logged in Steam users without having to log-in again on Steam itself (limits launch functionality though)  
+- **Random game picker** - Let the app choose when you don't know what to play (this was more for myself lmao)
 
-- Can launch the game from UI (utilizes Steam URI's for steam games and shortcuts alike)  
+- **User switching** - View libraries of other logged-in Steam users without re-authenticating
 
-- Can copy / open the compatdata path for easier management of titles  
-- - Can also copy App ID  
+- **Launch games** directly from UI (uses Steam URI's for both Steam games and shortcuts)
 
-- And of course, can launch Winetricks in the selected game's proton prefix.
+- **Prefix management** - Copy or open compatdata paths, copy App IDs
 
+- **Winetricks integration** - Launch Winetricks in any game's Proton prefix
+
+### CLI Features
+
+- **List all prefixes** - `list` command
+- **Search for games** - `search` command with case-insensitive name matching
+- **Run executables** - `run` command to execute any Windows program in a game's prefix
+- **Launch games** - `launch` command to start games via Steam
+- **Winetricks commands** - `winetricks` command to run any winetricks verb (EG: winecfg, vcrun2019)
+- **Multiple Steam installation support** - Works with Native, Flatpak, and (hopefully?) Snap Steam
+- **Environment variable support** - Use `STEAM_ROOT` to specify your Steam installation, or just `--steam-root` flag in CLI if you prefer
 
 ## Previews
 
@@ -44,4 +51,50 @@ Supports the following
 
 ```bash
 pip install -r requirements.txt
+```
+
+## Usage
+
+### GUI Mode
+
+Run without any arguments to default to GUI
+
+```bash
+python3 run.py
+```
+
+### CLI Mode
+
+```bash
+usage: run.py [-h] [-v] [-sr STEAM_ROOT]  ...
+
+Protontricks at Home
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         Enable verbose output
+  -sr, --steam-root STEAM_ROOT
+                        Path to specific Steam installation
+
+Commands:
+  
+    list                List all prefixes
+    search              Search for games
+    winetricks          Run winetricks
+    run                 Run executable
+    launch              Launch game
+
+Run without arguments to launch the GUI.
+
+Environment Variables:
+  STEAM_ROOT    Path to specific Steam installation (overrides auto-detection)
+
+Examples:
+  run.py list
+  run.py --steam-root ~/.local/share/Steam list
+  STEAM_ROOT=~/.var/app/com.valvesoftware.Steam/data/Steam run.py
+  run.py search Skyrim
+  run.py winetricks 12345 d3dx9
+  run.py run 12345 ~/Downloads/installer.exe
+  run.py launch 12345
 ```
