@@ -85,12 +85,12 @@ class SteamUser:
     def get_active_user(self) -> Tuple[Optional[str], Optional[str]]:
         """Get the most recently active Steam user."""
         users_data = self._load_users()
-        
-        for steamid, info in users_data.items():
-            if info.get("MostRecent") == "1":
-                return steamid, info.get("PersonaName", "Unknown")
-        
-        return None, None
+
+        if not users_data:
+            return None, None
+
+        steamid, info = max(users_data.items(), key=lambda item: int(item[1].get("Timestamp", 0)))
+        return steamid, info.get("PersonaName", "Unknown")
 
 
 
